@@ -1,7 +1,7 @@
 //+-----------------------------------------------------------------+
-//                                                       FxDOM.java |
-//                                            https://itx-team.com/ |
+//                                                    FxDOM_v4.java |
 //                                     © Copyright 2019 vmm@mail.ru |
+//                                   Author: #vmm -Makeev Vladimir  |
 //                                                                  |
 //                                                                  |
 //                                                                  | 
