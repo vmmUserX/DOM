@@ -1,7 +1,7 @@
 //+-----------------------------------------------------------------+
 //                                                       FxDOM.java |
 //                                            https://itx-team.com/ |
-//                                     © Copyright 2017 vmm@mail.ru |
+//                                     © Copyright 2019 vmm@mail.ru |
 //                                                                  |
 //                                                                  |
 //                                                                  | 
