@@ -1,5 +1,6 @@
 # DOM
-Depth of Market
+Depth of Market.
+
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
 
 There is an old riddle: "How to dance with a 500-pound gorilla?" Answer: "Any way she wants".
