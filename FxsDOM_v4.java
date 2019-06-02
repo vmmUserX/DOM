@@ -1,13 +1,15 @@
 //+-----------------------------------------------------------------+
 //                                                    FxDOM_v4.java |
+//                                                  Depth of Market |
 //                                     © Copyright 2019 vmm@mail.ru |
-//                                   Author: #vmm -Makeev Vladimir  |
-//                                                                  |
+//                                   Author: #vmm - Makeev Vladimir |
 //                                                                  |
 //                                                                  | 
 //+-----------------------------------------------------------------+
 package jforex;
-
+//+-----------------------------------------------------------------+
+// Подключение библиотек дилера и Java SE
+//+-----------------------------------------------------------------+
 import com.dukascopy.api.*;
 import com.dukascopy.api.RequiresFullAccess;
 import com.dukascopy.api.util.*;
@@ -18,7 +20,6 @@ import com.dukascopy.api.IEngine.OrderCommand;
 import com.dukascopy.api.chart.mouse.IChartPanelMouseEvent;
 import com.dukascopy.api.chart.mouse.IChartPanelMouseListener;
 
-import java.util.*;
 import java.text.*;
 import java.awt.*;
 import java.applet.*;
@@ -40,18 +41,20 @@ import javax.swing.JTextField.*;
 import javax.swing.text.*;
 import java.net.*;
 import java.io.*;
+import java.util.*;
+import java.util.concurrent.Callable;
+
 //import com.dukascopy.api.system.IPreferences.Platform.PreferencesSettings;
 //import com.dukascopy.api.system.IPreferences.Chart;
 //import com.dukascopy.api.system.IPreferences.Chart.Orders;
 //import com.dukascopy.api.system.IPreferences.PreferenceRoot;
 //import com.dukascopy.api.system.IPerfStatData;
 //import com.dukascopy.api.system.IPreferences.Platform;
-
 //import com.dukascopy.api.instrument.*;
 
-/**
- * Main Class of the strategy
- */
+//+-----------------------------------------------------------------+
+// Main Class of the strategy
+//+-----------------------------------------------------------------+
 @RequiresFullAccess // Some functions may need this
 public class FxsDOM_v4 implements IStrategy {
     // <editor-fold defaultstate="" desc="Main class variables">
@@ -63,7 +66,7 @@ public class FxsDOM_v4 implements IStrategy {
     private IAccount account = null;
     private IChart chart;
     private IUserInterface userInterface;
-    //private IFinancialInstrument fin;
+    // private IFinancialInstrument fin;
     // configurable variables
     @Configurable("Instrument:") 
     public Instrument instrumentThis = Instrument.EURUSD;
@@ -127,6 +130,7 @@ public class FxsDOM_v4 implements IStrategy {
     private double Leverage;
   
     //order variables
+    //+-----------------------------------------------------------------+
     private double Entry = Double.NaN;
     private double Amount = 0.01;
     private double StopLoss = 20;
@@ -145,12 +149,12 @@ public class FxsDOM_v4 implements IStrategy {
     private IChartObject TakeProfitLine;    
     //private int slip = com.dukascopy.api.instrument.IFinancialInstrument.getDefaultMarketSlippage();
     
-    /**
-     * onStart Function
-     * 
-     * @param context
-     * @throws JFException 
-     */
+    //+-----------------------------------------------------------------+
+    // onStart Function
+    // Точка входа
+    // @param context
+    // @throws JFException 
+    //+-----------------------------------------------------------------+
     @Override
     public void onStart(IContext context) throws JFException {
        this.context = context;
@@ -161,11 +165,11 @@ public class FxsDOM_v4 implements IStrategy {
        //IChartObject breakEvenLine;
        //IFeedDescriptor feedDescriptor = new TimePeriodAggregationFeedDescriptor(instrumentThis, Period.TICK, OfferSide.BID);
        //chart = context.openChart(feedDescriptor);
-       /** 
+       /***************************************************************************
        / Set variable
        / pipValue - 10 000 для 5-значных EURUSD, 100 -для 3-значных USDJPY
        / pipScale - 4 для 5-значных EURUSD, 2 - для 3-значных USDJPY
-       */
+       ***************************************************************************/
        pipValue = instrumentThis.getPipValue();
        pipScale = instrumentThis.getPipScale();
      
@@ -200,9 +204,15 @@ public class FxsDOM_v4 implements IStrategy {
        //TraceMouse();
        
     }
+    //+-----------------------------------------------------------------+
+    // Вход по каждому бару
+    //+-----------------------------------------------------------------+
     public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) throws JFException {
        
     }
+    //+-----------------------------------------------------------------+
+    // Account of user's deposit
+    //+-----------------------------------------------------------------+
     public void onAccount(IAccount account) throws JFException {
         AccountCurrency = account.getCurrency().toString();        // Счёт в валюте   
         Leverage = account.getLeverage();                          // Плечо = 100
@@ -213,7 +223,9 @@ public class FxsDOM_v4 implements IStrategy {
         MarginCutLevel = account.getMarginCutLevel();              // Маржин колл ниже которого закрываются ордера банком
         GlobalAccount = account.isGlobal();                        // Глобальный счёт
     }
-    
+    //+-----------------------------------------------------------------+
+    // Все сообщения от сервера дилера
+    //+-----------------------------------------------------------------+
     public void onMessage(IMessage message) throws JFException {
         // remove of the order on the table at order close
         //context.getConsole().getOut().println(message.getType()+" - "+message.getOrder().getOrderCommand());
@@ -239,6 +251,9 @@ public class FxsDOM_v4 implements IStrategy {
         } 
         
     }
+    //+-----------------------------------------------------------------+
+    // Выход
+    //+-----------------------------------------------------------------+
     @Override
     public void onStop() throws JFException {
          //context.closeChart(chart);
@@ -252,13 +267,16 @@ public class FxsDOM_v4 implements IStrategy {
          //}
     } // end onStop
     
-    /**
-     * onTick Function
-     * 
-     * @param instrument
-     * @param tick
-     * @throws JFException 
-     */
+    //+-----------------------------------------------------------------+
+    // onTick Function
+    // 
+    // @param instrument
+    // @param tick
+    // @throws JFException
+    //
+    // Вход по каждому тику (Tikers)
+    //
+    //+-----------------------------------------------------------------+
     @Override
     public void onTick(Instrument instrument, final ITick tick) throws JFException {
         if (!instrument.equals(this.instrumentThis)){
@@ -270,7 +288,7 @@ public class FxsDOM_v4 implements IStrategy {
             SwingUtilities.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                   // 5 sign
+                   // 5 sign value
                    freeForm.updatePrices(tick);
                    freeForm.setVolumes5sign(tick.getAsks(), tick.getAskVolumes(), tick.getBids(), tick.getBidVolumes(), NormalizeDouble((tick.getAsk() - tick.getBid())/pipValue, 1));
                 }
@@ -281,16 +299,71 @@ public class FxsDOM_v4 implements IStrategy {
            }  
         }
     }
-    /**************************************************
-     * ORDERS
-     * Submits an order at market  price with SL and TP.
-     * Submits an order at STOP Buy,Sell with SL and TP.
-     * Trailing Stop
-     * 
-     * @param orderCmd
-     * @return
-     * @throws JFException
-     *************************************************/
+    //+-----------------------------------------------------------------+
+    // ORDERS
+    // Submits an order at market  price with SL and TP.
+    // Submits an order at STOP Buy,Sell with SL and TP.
+    // Trailing Stop
+    // 
+    // @param orderCmd
+    // @return
+    // @throws JFException
+    //
+    //******************************************************************
+    // * class  submitOrder
+    // submitOrderTask task = new submitOrderTask(orderAmount, 
+    //                                            pr, 
+    //                                            "BUY_", 
+    //                                            OrderCommand.BUYSTOP, 
+    //                                            StopLoss, 
+    //                                            tp
+    // );
+    // context.executeTask(task); 
+    //+-----------------------------------------------------------------+
+     private class submitOrderTask implements Callable<IOrder> {
+        private OrderCommand orderCmd;
+        private final double amount;
+        private final double price;
+        private final double slPips;
+        private final double tpPips;
+        private final String label;
+        private double sl;
+        private double tp;
+        
+        public submitOrderTask(double amount, double price, String label, OrderCommand orderCmd, double slPips, double tpPips) {
+            this.amount = amount;
+            this.price = price;
+            this.slPips = slPips;
+            this.tpPips = tpPips;
+            this.label = label;
+        }
+    
+        public IOrder call() throws Exception {
+            try 
+            {
+                if (TrailingStop && TrailingStep != 0) {
+                    IOrder order = engine.submitOrder(label, instrumentThis, orderCmd, amount, price, slippage);
+                } else {
+                    sl = orderCmd.isLong()
+                       ? NormalizeDouble(price - (slPips * pipValue), pipScale)
+                       : NormalizeDouble(price + (slPips * pipValue), pipScale); 
+                    tp = tpPips; 
+                    IOrder order = engine.submitOrder(label, instrumentThis, orderCmd, amount, price, slippage, sl, tp);
+                }
+                if (orderCmd == OrderCommand.BUYSTOP || orderCmd == OrderCommand.PLACE_BID)
+                    OrdersBuy.add(order);
+                else if(orderCmd == OrderCommand.SELLSTOP || orderCmd == OrderCommand.PLACE_OFFER)
+                    OrdersSell.add(order);
+            } catch (JFException e) {
+                 context.getConsole().getOut().println("Error: "+e.getCause());
+            }
+            //print("Created BUYSTOP order: " + order.getLabel());
+            return order;
+        }
+    }
+    //+-----------------------------------------------------------------+
+    //
+    //+-----------------------------------------------------------------+
     public void submitMarketOrder(String orderType){
         try {
             pipValue = instrumentThis.getPipValue();
@@ -356,6 +429,9 @@ public class FxsDOM_v4 implements IStrategy {
         }
    
     }
+    //+-----------------------------------------------------------------+
+    //
+    //+-----------------------------------------------------------------+
     private void submitStopOrder(OrderCommand orderCmd) throws JFException {
        try { 
            double price = 0;
@@ -396,14 +472,17 @@ public class FxsDOM_v4 implements IStrategy {
             e.printStackTrace();
         }  
     }
-    // label orders *************
+    //+-----------------------------------------------------------------+
+    // label orders 
+    //+-----------------------------------------------------------------+
     protected String getLabel(Instrument instrument) {
            String label = instrument.name() + "_" + (counter++);
            return label;
     }
+    //+-----------------------------------------------------------------+
     // Mouse adapter
+    //+-----------------------------------------------------------------+
     public void TraceMouse() {
-        
            chart.addMouseListener(false, listener = new IChartPanelMouseListener(){
            public void mouseClicked(IChartPanelMouseEvent e) { actionMouse(e, "mouse Clicked");}
            public void mousePressed(IChartPanelMouseEvent e) { actionMouse(e, "mouse Pressed");}
@@ -414,6 +493,9 @@ public class FxsDOM_v4 implements IStrategy {
            public void mouseMoved(IChartPanelMouseEvent e) { actionMouse(e, "mouse Moved");}
         }); 
     }
+    //+-----------------------------------------------------------------+
+    //
+    //+-----------------------------------------------------------------+
     private void actionMouse(IChartPanelMouseEvent e, String comment){
        //call e.getPrice and e.getTime instead of e.toString if you wish to customize the logging formatting or make use of the values
         //context.getConsole().getOut().println(String.format("price=%3.7s com=%s x=%s y=%s", e.getPrice(), e.toString(), e.getSourceEvent().getXOnScreen(), e.getSourceEvent().getYOnScreen()));
@@ -441,11 +523,11 @@ public class FxsDOM_v4 implements IStrategy {
          }              
     }
     
-    /**
-     * Class fxDomForm
-     * 
-     * Creates the form window where we can setup our trades 
-     */
+    //+-----------------------------------------------------------------+
+    // Class fxDomForm
+    // 
+    // Creates the form window where we can setup our trades 
+    //+-----------------------------------------------------------------+
     class fxDomForm extends  JFrame implements ActionListener{
         // Declare
         // <editor-fold defaultstate="collapsed" desc="Class variables">
@@ -504,14 +586,17 @@ public class FxsDOM_v4 implements IStrategy {
         //private  JTextField tTPPrice = new JTextField();
         //private  JTextField tCounter = new JTextField();;
                  
-        /**
-        * class contructor for Resize fxDomForm
-        * 
-        * 
-        */
+        //+-----------------------------------------------------------------+
+        // class contructor for Resize fxDomForm
+        // 
+        // 
+        //+-----------------------------------------------------------------+
         public fxDomForm() {
                initPlaceControlsOnFrame();
-        } 
+        }
+        //+-----------------------------------------------------------------+
+        //
+        //+-----------------------------------------------------------------+
         @Override
         public void paint(Graphics g) {
                 Dimension d = getSize();
@@ -530,11 +615,11 @@ public class FxsDOM_v4 implements IStrategy {
         }
         
         
-    /**
-    * Class fxDomForm
-    * 
-    * Creates the form window where we can setup our trades 
-    */
+    //+-----------------------------------------------------------------+
+    // Class fxDomForm
+    // 
+    // Creates the form window where we can setup our trades 
+    //+-----------------------------------------------------------------+
     @SuppressWarnings("unchecked")
     private void initPlaceControlsOnFrame() {
         // Main form
@@ -668,6 +753,9 @@ public class FxsDOM_v4 implements IStrategy {
         AbstractDocument doc3 = (AbstractDocument) tTP.getDocument();
         doc3.setDocumentFilter(new LengthFilter(doc3.getLength(), 4));
         //
+        //+-----------------------------------------------------------------+
+        // Buttons
+        //+-----------------------------------------------------------------+
         tAmount.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {
@@ -883,7 +971,10 @@ public class FxsDOM_v4 implements IStrategy {
 
     }
      
-     // 5 sign
+     //+-----------------------------------------------------------------+
+     // 5 sign value
+     //
+     //+-----------------------------------------------------------------+
      public void setVolumes5sign(double[] asks, double[] askVols, double[] bids, double[] bidVols, double spread) {
         int i = 0; 
         int b = 0; 
@@ -990,14 +1081,15 @@ public class FxsDOM_v4 implements IStrategy {
             //} else  data[i][0] = ""; 
         }
         tableModel.setData(data); 
-     } // 5 sign
-     /**
-         * updatePrices Function
-         * 
-         * Update the Labels of bid and ask price
-         * 
-         * @param tick 
-         */
+     }  // 5 sign
+        
+        //+-----------------------------------------------------------------+
+        // updatePrices Function
+        // 
+        // Update the Labels of bid and ask price
+        // 
+        // @param tick 
+        //+-----------------------------------------------------------------+
         public void updatePrices(ITick tick){
             if (topVisible == true) {
             tickBid = tick.getBid();
@@ -1047,11 +1139,12 @@ public class FxsDOM_v4 implements IStrategy {
             }
             //  
         }// end updatePrices
-        /**
-         * Validate the textfields values and return true if ok
-         * 
-         * @return true if text fields ok, false otherwise 
-         */
+        
+        //+-----------------------------------------------------------------+
+        // Validate the textfields values and return true if ok
+        // 
+        // @return true if text fields ok, false otherwise 
+        //+-----------------------------------------------------------------+
         private boolean validateFields(){
             Amount = Double.valueOf(tAmount.getText());
             Slippage = Double.valueOf(tSlip.getText());
@@ -1060,12 +1153,14 @@ public class FxsDOM_v4 implements IStrategy {
             //context.getConsole().getOut().println(StopLoss+" - "+TakeProfit);
             return true;
         }// end validateprices
-     /* actionPerformed Function
-     * 
-     * Window events for radiobuttons and buttons
-     * 
-     * @param e 
-    */
+        
+     //+-----------------------------------------------------------------+
+     // actionPerformed Function
+     // 
+     // Window events for radiobuttons and buttons
+     // 
+     // @param e 
+     //+-----------------------------------------------------------------+
      @Override
      public void actionPerformed(ActionEvent ex) {
  
@@ -1214,8 +1309,10 @@ public class FxsDOM_v4 implements IStrategy {
        }  //End metod closeOrders
      
     } //End class fxDomForm
-   
+    
+    //+-----------------------------------------------------------------+
     //
+    //+-----------------------------------------------------------------+
     public class LengthFilter extends DocumentFilter {
        private int currentLength;
        private int maxLength;
@@ -1247,12 +1344,13 @@ public class FxsDOM_v4 implements IStrategy {
       }
     }
 
-    /**
-     * Классы DOM
-     *
-     */
-     // Граница с округлением
-  
+  //+-----------------------------------------------------------------+
+  // Классы DOM
+  //
+  //+-----------------------------------------------------------------+
+  //  
+  //  Округления больших кнопок Buy(Bid) & Sell(Ask)
+  //+-----------------------------------------------------------------+  
   class CurvedBorder extends AbstractBorder {
   private int r = 1;
   private Color wallColor = Color.decode("0xCCCCCC");
@@ -1313,118 +1411,122 @@ public class FxsDOM_v4 implements IStrategy {
     return r;
   }
   }
-   
-    // Модель данных таблицы
-    class MarketDepthTableModel extends AbstractTableModel {
-    private String[][] data = new String[0][0];
     
-    public Class<?> getColumnClass(int columnIndex) {
-        return String.class;
-    }
+  //+-----------------------------------------------------------------+ 
+  // Модель данных таблицы
+  //+-----------------------------------------------------------------+  
+  class MarketDepthTableModel extends AbstractTableModel {
+  private String[][] data = new String[0][0];
     
-    public void setData(String[][] data) {
-        this.data = data;
-        fireTableDataChanged();
-    }
+  public Class<?> getColumnClass(int columnIndex) {
+      return String.class;
+  }
+    
+  public void setData(String[][] data) {
+      this.data = data;
+      fireTableDataChanged();
+  }
  
-    public int getRowCount() {
-        return data.length;
-    }
+  public int getRowCount() {
+      return data.length;
+  }
  
-    public int getColumnCount() {
-        return 6;
-    }
-    public void setValueAt(String value, int row, int col) {
-          data[row][col] = value;
-          fireTableCellUpdated(row, col);
-    }
-    public Object getValueAt(int row, int column) {
-        if (data[row][column] == "0") {
-            return "";
-        } else {
-            return data[row][column];
-        }
-    }
+  public int getColumnCount() {
+      return 6;
+  }
+  public void setValueAt(String value, int row, int col) {
+        data[row][col] = value;
+        fireTableCellUpdated(row, col);
+  }
+  public Object getValueAt(int row, int column) {
+      if (data[row][column] == "0") {
+          return "";
+      } else {
+          return data[row][column];
+      }
+  }
  
-    public String getColumnName(int column) {
+  public String getColumnName(int column) {
  
-        switch (column) {
-            case 0:
-                return "  Total"; 
-            case 1:
-                return "  Price";
-            case 2:
-                return "Bid acc. vol.";        
-            case 3:
-                return "Bid";    
-            case 4:
-                return "Ask";
-            case 5:
-                return "Ask acc. vol.";
-            case 6:
-                return "Bid0";    
-            case 7:
-                return "Ask0";
-            default:
-                return "";
-        }
-    }
-    }
-    // Классы DOM
-    double NormalizeDouble(double val, int prec) {
-       String pattern = "0.0";
-       for(int i=1;i<prec;i++){
-           if(i==prec-1) pattern += "#";
-           else pattern += "0";
-       }
-       DecimalFormat applydeci = new DecimalFormat(pattern);
-       Double ret = new Double(applydeci.format(val).replace(',', '.')).doubleValue();
-       return(ret);
-    }
-    static public String customFormat(String pattern, double value ) {
-      //customFormat("###,###.###", 123456.789);  
-      DecimalFormat myFormatter = new DecimalFormat(pattern);
-      String output = myFormatter.format(value);
-      return output;
-    }
-    /**
-     * Sets the foreground/background colors of the cells
-     */
-    // class Окрашивание окон
-    public class DateCellRenderer extends JLabel implements TableCellRenderer {
-        
-     public DateCellRenderer() {       
-      setOpaque(true);
+      switch (column) {
+          case 0:
+              return "  Total"; 
+          case 1:
+              return "  Price";
+          case 2:
+              return "Bid acc. vol.";        
+          case 3:
+              return "Bid";    
+          case 4:
+              return "Ask";
+          case 5:
+              return "Ask acc. vol.";
+          case 6:
+              return "Bid0";    
+          case 7:
+              return "Ask0";
+          default:
+              return "";
+      }
+  }
+  }
+  //+-----------------------------------------------------------------+  
+  // Utilities DOM
+  //+-----------------------------------------------------------------+  
+  double NormalizeDouble(double val, int prec) {
+     String pattern = "0.0";
+     for(int i=1;i<prec;i++){
+         if(i==prec-1) pattern += "#";
+         else pattern += "0";
      }
-     @Override
-     public Component getTableCellRendererComponent(JTable table,
+     DecimalFormat applydeci = new DecimalFormat(pattern);
+     Double ret = new Double(applydeci.format(val).replace(',', '.')).doubleValue();
+     return(ret);
+  }
+  static public String customFormat(String pattern, double value ) {
+    //customFormat("###,###.###", 123456.789);  
+    DecimalFormat myFormatter = new DecimalFormat(pattern);
+    String output = myFormatter.format(value);
+    return output;
+  }
+  //+-----------------------------------------------------------------+
+  // Sets the foreground/background colors of the cells
+  //+-----------------------------------------------------------------+
+  // class Окрашивание окон
+  public class DateCellRenderer extends JLabel implements TableCellRenderer {
+        
+  public DateCellRenderer() {       
+    setOpaque(true);
+  }
+   @Override
+   public Component getTableCellRendererComponent(JTable table,
                                                    Object value,
                                                    boolean isSelected,
                                                    boolean hasFocus,
                                                    int row,
                                                    int column) {
-        //@param: table - глобально применяет окрашивание в указанным строкам, ячейкам, столбцам
-        //@param: value - применяет окрашивание к указанному значению в ячейке
-        //@param: isSelected - это понятно и без объяснений (применяет окрашивание к выделению)
-        //@param: hasFocus - применяет окрашивание к выделенной ячейке
-        //@param: row - применяет окрашивание в указанной по индексу строке
-        //@param: column - применяет окрашивание в указанной по индексу колонке
-        JLabel c = new JLabel();
-        if(column==0){
+      //@param: table - глобально применяет окрашивание в указанным строкам, ячейкам, столбцам
+      //@param: value - применяет окрашивание к указанному значению в ячейке
+      //@param: isSelected - это понятно и без объяснений (применяет окрашивание к выделению)
+      //@param: hasFocus - применяет окрашивание к выделенной ячейке
+      //@param: row - применяет окрашивание в указанной по индексу строке
+      //@param: column - применяет окрашивание в указанной по индексу колонке
+      JLabel c = new JLabel();
+      if(column==0){
             c.setHorizontalAlignment(JLabel.RIGHT);
             c.setText("<html><div style='border: 1em solid #ffffff;font-size:10.0pt;text-align:right;padding:1px;'>"+value.toString()+"</div></html>");
             //c.setText(value.toString());
-        }
-        if(column==6){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}
-        if(column==7){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}
-        // Price
-        if(column==1){c.setHorizontalAlignment(JLabel.CENTER);c.setText("<html><b>"+value.toString()+"</b></html>");}
-        // Выделение стакана
-        if (onlyBestPrice){
+      }
+      if(column==6){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}
+      if(column==7){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}
+      // Price
+      if(column==1){c.setHorizontalAlignment(JLabel.CENTER);c.setText("<html><b>"+value.toString()+"</b></html>");}
+      // Выделение стакана
+      if (onlyBestPrice){
             // Показать лучшую цену Bid и Ask.
             if (table.getModel().getValueAt(row, 6).toString() == "1"){if (column==1 || column==3 || column==4){c.setOpaque(true);c.setBackground(Color.PINK);if(column==3){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}}}          //Bid - розовый   
             if (table.getModel().getValueAt(row, 7).toString() == "1"){if (column==1 || column==3 || column==4){c.setOpaque(true);c.setBackground(new Color(0x5aff5a));if(column==4){c.setHorizontalAlignment(JLabel.LEFT);c.setText(value.toString());}}}  //Ask - зелёный
-        } else {
+      } else {
             // Показать весь стакан, цены Bid и Ask, разряжение стакана.
             if(column==3){c.setHorizontalAlignment(JLabel.RIGHT);c.setText(value.toString());}
             if(column==4){c.setHorizontalAlignment(JLabel.LEFT);c.setText(value.toString());}
@@ -1432,19 +1534,19 @@ public class FxsDOM_v4 implements IStrategy {
             if (table.getModel().getValueAt(row, 4) != ""){if (column==1 || column==4){c.setOpaque(true);c.setBackground(new Color(0xe6ffe6));}}
             if (table.getModel().getValueAt(row, 6).toString() == "1"){if (column==1 || column==3 || column==4){c.setOpaque(true);c.setBackground(Color.PINK);}}          //Bid - розовый   
             if (table.getModel().getValueAt(row, 7).toString() == "1"){if (column==1 || column==3 || column==4){c.setOpaque(true);c.setBackground(new Color(0x5aff5a));}} //Ask - зелёный
-        }
-        // Выделение объёмов BID
-        if (table.getModel().getValueAt(row, 6).toString() == "1" || table.getModel().getValueAt(row, 6).toString() == "2"){
+      }
+      // Выделение объёмов BID
+      if (table.getModel().getValueAt(row, 6).toString() == "1" || table.getModel().getValueAt(row, 6).toString() == "2"){
             if(column==2){c.setOpaque(true); c.setBackground(new Color(0xdcffff));} // синий
             if(column==5){c.setOpaque(true); c.setBackground(new Color(0xfff6c6));} // оранжевый
-        }
-        // Выделение объёмов ASK
-        if (table.getModel().getValueAt(row, 7).toString() == "1" || table.getModel().getValueAt(row, 7).toString() == "2"){
+      }
+      // Выделение объёмов ASK
+      if (table.getModel().getValueAt(row, 7).toString() == "1" || table.getModel().getValueAt(row, 7).toString() == "2"){
             if(column==2){c.setOpaque(true); c.setBackground(new Color(0xfff6c6));} // оранжевый
             if(column==5){c.setOpaque(true); c.setBackground(new Color(0xdcffff));} // синий
-        }
-        // Bid Vol diag
-        if (table.getModel().getValueAt(row, 2) != ""){
+      }
+      // Bid Vol diag
+      if (table.getModel().getValueAt(row, 2) != ""){
             double procBid = 0;
             if (column==2){
                 procBid = new Double(table.getModel().getValueAt(row,2).toString());
@@ -1452,28 +1554,28 @@ public class FxsDOM_v4 implements IStrategy {
                    +"<div style='border-right: "+procBid*70/MAX_SUM+" solid red;height:6;border-right-color:red;'></div>"
                    +"</div></html>");     
             }    
-        }
-        // Ask Vol diag
-        if (table.getModel().getValueAt(row, 5) != "") {
+      }
+      // Ask Vol diag
+      if (table.getModel().getValueAt(row, 5) != "") {
             double procAsk = 0;
             if (column==5){
                 procAsk = new Double(table.getModel().getValueAt(row,5).toString());
                 c.setText("<html><div style='border:0px solid #ffffff;width:70;height:0;font-size:10.0pt;padding:1px;'>"+procAsk
                    +"<div style='height:6;width:"+procAsk*100/MAX_SUM+"%;background-color:green;'></div>"
                    +"</div></html>");
-            }    
-        }
-        //if (isSelected){
-        //   String key = table.getModel().getValueAt(row, 2).toString();
-        //   table.getModel().getValueAt(row, 7) = "0.01";
-        //   context.getConsole().getOut().println(key); 
-        //}
-        //table.getModel().setValueAt(c.getText(), row, column);     
-        return c;
+          }    
+      }
+      //if (isSelected){
+      //   String key = table.getModel().getValueAt(row, 2).toString();
+      //   table.getModel().getValueAt(row, 7) = "0.01";
+      //   context.getConsole().getOut().println(key); 
+      //}
+      //table.getModel().setValueAt(c.getText(), row, column);     
+      return c;
         
-     }
+   }
      
-    }
-    // End class DOM
+  }
+  // End class DOM
     
 }
