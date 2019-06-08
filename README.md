@@ -1,4 +1,4 @@
-# DOM
+# JAVA
 Depth of Market.
 
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
