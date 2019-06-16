@@ -22,6 +22,7 @@ import java.awt.Stroke;
 import java.util.List;
 import java.util.Map;
 /**
+ * Indicator: PitVolumeDivergence.java
  * Created by: © SpiritFX
  * Review: Sep 18, 2018
  * Version 2.0
