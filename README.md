@@ -1,5 +1,5 @@
 # JForex/JAVA
-dom.java - Depth of Market, Strategy
+<b>dom.java - Depth of Market, Strategy</b>
 
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
 
@@ -25,7 +25,7 @@ The scanner looking for the signals for one pair and one period for the free ver
 
 In paid version any number of instruments and periods in life or demo. I use 7 pairs for 3 periods M5-M15-H1. The ideal signals are obtained when signal 3 period at the same time. In this version, when you run the strategy in the list of signal appears as a green or red arrow and sound for Instrument. Go to the Instrument and to open a position manually. In this shell I can insert any strategy according to your strategy.
 
-PitVolumeDivergence.java - Indicator
+<b>PitVolumeDivergence.java - Indicator</b>
 
 The indicator Pit Volume Divergence consists of two parts. One part above the zero level shows the volume of buy and sells for each bar . The second part are shown below the zero point is the difference between ASK>BID and BID>ASK.
 
