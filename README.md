@@ -25,4 +25,4 @@ Positioning in the terminal, one or two indicators with the upper and lower part
 This indicator is useful for those who uses in trade volumes. For example, VSA. Volume is the key to the truth. It is directly linked to the price movement and the relationship this complex. Figuratively speaking it is the powerhouse of the market.
    Suppose, on the chart, good rally, strong bull market, and there is a bar with narrow range and very high volume. Tell us about anything high volume? Yes, he says. Many retail traders are buying and your purchase price will not let down. And when many retail traders are buying, and then a smarts will sell and not put a price up. The narrow bar, the end of the upward movement of prices (Rally). The market is ready to fall. And no fundamental forces can not stop the market from falling.
 
-(https://github.com/vmmUserX/JAVA/issues/1#issue-457073468)
+![](https://github.com/vmmUserX/JAVA/issues/1#issue-457073468)
