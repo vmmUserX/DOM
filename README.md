@@ -4,7 +4,7 @@
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/40513889/59625567-48fe3880-9142-11e9-8c35-0626604a1fa6.jpg" alt="DOM"/>
+<img src="https://user-images.githubusercontent.com/40513889/59625567-48fe3880-9142-11e9-8c35-0626604a1fa6.jpg" title="Depth Of Market"/>
 </p>
 
 There is an old riddle: "How to dance with a 500-pound gorilla?" Answer: "Any way she wants".
@@ -15,7 +15,7 @@ Any day you will see an active market makers. You need to know what they are doi
 ### Scaner_v1.java - Strategy
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/40513889/59628320-11df5580-9149-11e9-9b7e-a43e1c5ec8cf.png" />
+<img src="https://user-images.githubusercontent.com/40513889/59628320-11df5580-9149-11e9-9b7e-a43e1c5ec8cf.png" title="Scaner v1"/>
 </p>
 
 This strategy is not trading robot. This is a wrapper for any trading strategies. As an example, put my.
@@ -28,7 +28,7 @@ In paid version any number of instruments and periods in life or demo. I use 7 p
 ### PitVolumeDivergence.java - Indicator
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/40513889/59628943-68995f00-914a-11e9-98a5-cfed9650a029.png" />
+<img src="https://user-images.githubusercontent.com/40513889/59628943-68995f00-914a-11e9-98a5-cfed9650a029.png" title="Pit Volume Divergence"/>
 </p>
 
 The indicator Pit Volume Divergence consists of two parts. One part above the zero level shows the volume of buy and sells for each bar . The second part are shown below the zero point is the difference between ASK>BID and BID>ASK.
