@@ -2,7 +2,7 @@
 dom.java - Depth of Market, Strategy
 
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
-
+<center>
 <img src="https://user-images.githubusercontent.com/40513889/59625567-48fe3880-9142-11e9-8c35-0626604a1fa6.jpg"/>
 
 There is an old riddle: "How to dance with a 500-pound gorilla?" Answer: "Any way she wants".
