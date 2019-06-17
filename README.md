@@ -2,7 +2,7 @@
 dom.java - Depth of Market, Strategy
 
 DOM shows limit orders and cumulative horizontal volumes on the sides BID, ASK like Level II on the stock market.
-{    
+{                            n
 <div id="center"><div class="content">
 <img src="https://user-images.githubusercontent.com/40513889/59625567-48fe3880-9142-11e9-8c35-0626604a1fa6.jpg" alt="DOM"/>
 </div></div>
