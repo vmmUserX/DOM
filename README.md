@@ -12,7 +12,7 @@ Any day you will see an active market makers. You need to know what they are doi
    With the advent of new technologies, a detailed study of the tape is gradually transformed into a field of study clusters. The cluster volume is, in fact, the aggregate value of the volume within a calculation period.
    
    
-Scaner_v1.java - Strategy
+<b>Scaner_v1.java - Strategy</b>
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/40513889/59628320-11df5580-9149-11e9-9b7e-a43e1c5ec8cf.png" />
