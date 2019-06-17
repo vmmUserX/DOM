@@ -14,6 +14,10 @@ Any day you will see an active market makers. You need to know what they are doi
    
 Scaner_v1.java - Strategy
 
+<p align="center">
+<img src="https://user-images.githubusercontent.com/40513889/59628320-11df5580-9149-11e9-9b7e-a43e1c5ec8cf.png" />
+</p>
+
 This strategy is not trading robot. This is a wrapper for any trading strategies. As an example, put my.
 
 The main task of the scanner search for the signals at the main trading strategy.
