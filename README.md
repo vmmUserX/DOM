@@ -27,6 +27,10 @@ In paid version any number of instruments and periods in life or demo. I use 7 p
 
 <b>PitVolumeDivergence.java - Indicator</b>
 
+<p align="center">
+<img src="https://user-images.githubusercontent.com/40513889/59628943-68995f00-914a-11e9-98a5-cfed9650a029.png" />
+</p>
+
 The indicator Pit Volume Divergence consists of two parts. One part above the zero level shows the volume of buy and sells for each bar . The second part are shown below the zero point is the difference between ASK>BID and BID>ASK.
 
 Positioning in the terminal, one or two indicators with the upper and lower part.
